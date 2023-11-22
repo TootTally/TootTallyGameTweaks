@@ -6,23 +6,27 @@ using System.IO;
 using TootTallyCore.Utils.TootTallyModules;
 using TootTallySettings;
 using UnityEngine;
+using TootTallyCore.Utils.TootTallyNotifs;
 
-namespace TootTally.ModuleTemplate
+namespace TootTallyGameTweaks
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     [BepInDependency("TootTallyCore", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("TootTallySettings", BepInDependency.DependencyFlags.HardDependency)]
+    //Temporary
+    [BepInDependency("TootTallyLeaderboard", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("TootTallySpectator", BepInDependency.DependencyFlags.HardDependency)]
     public class Plugin : BaseUnityPlugin, ITootTallyModule
     {
         public static Plugin Instance;
 
-        private const string CONFIG_NAME = "ModuleTemplate.cfg";
+        private const string CONFIG_NAME = "GameTweaks.cfg";
         private Harmony _harmony;
         public ConfigEntry<bool> ModuleConfigEnabled { get; set; }
         public bool IsConfigInitialized { get; set; }
 
         //Change this name to whatever you want
-        public string Name { get => PluginInfo.PLUGIN_NAME; set => Name = value; }
+        public string Name { get => "GameTweaks"; set => Name = value; }
 
         public static TootTallySettingPage settingPage;
 
@@ -41,7 +45,7 @@ namespace TootTally.ModuleTemplate
         private void TryInitialize()
         {
             // Bind to the TTModules Config for TootTally
-            ModuleConfigEnabled = TootTallyCore.Plugin.Instance.Config.Bind("Modules", "<insert module name here>", true, "<insert module description here>");
+            ModuleConfigEnabled = TootTallyCore.Plugin.Instance.Config.Bind("Modules", "GameTweaks", true, "Various game tweaks, improvements and QoL features.");
             TootTallyModuleManager.AddModule(this);
             TootTallySettings.Plugin.Instance.AddModuleToSettingPage(this);
         }
@@ -50,18 +54,45 @@ namespace TootTally.ModuleTemplate
         {
             string configPath = Path.Combine(Paths.BepInExRootPath, "config/");
             ConfigFile config = new ConfigFile(configPath + CONFIG_NAME, true);
-            // Set your config here by binding them to the related ConfigEntry
-            // Example:
-            // Unlimited = config.Bind(CONFIG_FIELD, "Unlimited", DEFAULT_UNLISETTING)
+            ChampMeterSize = config.Bind("General", "ChampMeterSize", 1f, "Resize the champ meter to make it less intrusive.");
+            SyncDuringSong = config.Bind("General", "Sync During Song", false, "Allow the game to sync during a song, may cause lags but prevent desyncs.");
+            HideTromboner = config.Bind("General", "Hide Tromboner", false, "Hide the Tromboner during gameplay.");
+            RandomizeKey = config.Bind("General", "RandomizeKey", KeyCode.F5, "Press that key to randomize.");
+            MuteButtonTransparency = config.Bind("General", "MuteBtnAlpha", .25f, "Change the transparency of the mute button.");
+            TouchScreenMode = config.Bind("Misc", "TouchScreenMode", false, "Tweaks for touchscreen users.");
+            OverwriteNoteSpacing = config.Bind("NoteSpacing", "OverwriteNoteSpacing", false, "Make the note spacing always the same.");
+            NoteSpacing = config.Bind("NoteSpacing", "NoteSpacing", 280.ToString(), "Note Spacing Value");
+            SkipCardAnimation = config.Bind("Misc", "SkipCardAnimation", true, "Skip the animation when opening cards.");
+            RemoveLyrics = config.Bind("Misc", "RemoveLyrics", false, "Remove Lyrics from songs.");
+            OptimizeGame = config.Bind("Misc", "OptimizeGame", false, "Instantiate and destroy notes as they enter and leave the screen.");
+            SliderSamplePoints = config.Bind("Misc", "SliderSamplePoints", 8f, "Increase or decrease the quality of slides.");
+            RememberMyBoner = config.Bind("RMB", "RememberMyBoner", true, "Remembers the things you selected in the character selection screen.");
+            TootRainbow = config.Bind("RMB", "TootRainbow", false, "Remembers the tootrainbow you selected.");
+            LongTrombone = config.Bind("RMB", "LongTrombone", false, "Remembers the longtrombone you selected.");
+            CharacterID = config.Bind("RMB", "CharacterID", 0, "Remembers the character you selected.");
+            TromboneID = config.Bind("RMB", "TromboneID", 0, "Remembers the trombone you selected.");
+            VibeID = config.Bind("RMB", "VibeID", 0, "Remembers the vibe you selected.");
+            SoundID = config.Bind("RMB", "SoundID", 0, "Remembers the sound you selected.");
+            AudioLatencyFix = config.Bind("Misc", "AudioLatencyFix", true, "Fix audio latency bug related when playing at different game speeds.");
+            RemoveConfetti = config.Bind("Misc", "Remove Confetti", false, "Removes the confetti in the score screen.");
 
-            settingPage = TootTallySettingsManager.AddNewPage("ModulePageName", "HeaderText", 40f, new Color(0,0,0,0));
-            if (settingPage != null) {
-                // Use TootTallySettingPage functions to add your objects to TootTallySetting
-                // Example:
-                // page.AddToggle(name, option.Unlimited);
-            }
+            settingPage = TootTallySettingsManager.AddNewPage("GameTweaks", "Game Tweaks", 40f, new Color(0, 0, 0, 0));
+            settingPage?.AddSlider("Champ Meter Size", 0, 1, ChampMeterSize, false);
+            settingPage?.AddSlider("Mute Btn Alpha", 0, 1, MuteButtonTransparency, false);
+            settingPage?.AddToggle("Hide Tromboner", HideTromboner);
+            settingPage?.AddToggle("Sync During Song", SyncDuringSong);
+            settingPage?.AddToggle("Touchscreen Mode", TouchScreenMode, (value) => GlobalVariables.localsettings.mousecontrolmode = value ? 0 : 1);
+            settingPage?.AddToggle("Skip Card Animation", SkipCardAnimation);
+            settingPage?.AddToggle("Overwrite Note Spacing", OverwriteNoteSpacing, OnOverwriteNoteSpacingToggle);
+            settingPage?.AddToggle("Remove Lyrics", RemoveLyrics);
+            settingPage?.AddToggle("Optimize Game", OptimizeGame, OnOptimizeGameToggle);
+            OnOptimizeGameToggle(OptimizeGame.Value);
+            settingPage?.AddToggle("Remember My Boner", RememberMyBoner);
+            OnOverwriteNoteSpacingToggle(OverwriteNoteSpacing.Value);
+            settingPage?.AddToggle("Fix Audio Latency", AudioLatencyFix);
+            settingPage?.AddToggle("Remove Confetti", RemoveConfetti);
 
-            _harmony.PatchAll(typeof(ModuleTemplatePatches));
+            _harmony.PatchAll(typeof(GameTweaksPatches));
             LogInfo($"Module loaded!");
         }
 
@@ -72,13 +103,51 @@ namespace TootTally.ModuleTemplate
             LogInfo($"Module unloaded!");
         }
 
-        public static class ModuleTemplatePatches
+        public void OnOptimizeGameToggle(bool value)
         {
-            // Apply your Trombone Champ patches here
+            if (value)
+                settingPage?.AddSlider("SliderSamplePoints", 2, 50, SliderSamplePoints, true);
+            else
+                settingPage?.RemoveSettingObjectFromList("SliderSamplePoints");
+
         }
 
-        // Add your ConfigEntry objects that define your configs
-        // Example:
-        // public ConfigEntry<bool> Unlimited { get; set; }
+        public void OnOverwriteNoteSpacingToggle(bool value)
+        {
+            if (value)
+                settingPage?.AddTextField("NoteSpacing", NoteSpacing.Value, false, OnNoteSpacingSubmit);
+            else
+                settingPage?.RemoveSettingObjectFromList("NoteSpacing");
+        }
+
+        public void OnNoteSpacingSubmit(string value)
+        {
+            if (int.TryParse(value, out var num) && num > 0)
+                NoteSpacing.Value = num.ToString();
+            else
+                TootTallyNotifManager.DisplayNotif("Value has to be a positive integer.");
+        }
+
+        public ConfigEntry<float> ChampMeterSize { get; set; }
+        public ConfigEntry<float> MuteButtonTransparency { get; set; }
+        public ConfigEntry<bool> SyncDuringSong { get; set; }
+        public ConfigEntry<KeyCode> RandomizeKey { get; set; }
+        public ConfigEntry<bool> TouchScreenMode { get; set; }
+        public ConfigEntry<bool> OverwriteNoteSpacing { get; set; }
+        public ConfigEntry<string> NoteSpacing { get; set; }
+        public ConfigEntry<bool> HideTromboner { get; set; }
+        public ConfigEntry<bool> SkipCardAnimation { get; set; }
+        public ConfigEntry<bool> RemoveLyrics { get; set; }
+        public ConfigEntry<bool> OptimizeGame { get; set; }
+        public ConfigEntry<float> SliderSamplePoints { get; set; }
+        public ConfigEntry<bool> RememberMyBoner { get; set; }
+        public ConfigEntry<bool> LongTrombone { get; set; }
+        public ConfigEntry<bool> TootRainbow { get; set; }
+        public ConfigEntry<int> CharacterID { get; set; }
+        public ConfigEntry<int> SoundID { get; set; }
+        public ConfigEntry<int> VibeID { get; set; }
+        public ConfigEntry<int> TromboneID { get; set; }
+        public ConfigEntry<bool> AudioLatencyFix { get; set; }
+        public ConfigEntry<bool> RemoveConfetti { get; set; }
     }
 }
