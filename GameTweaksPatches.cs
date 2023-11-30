@@ -49,7 +49,7 @@ namespace TootTallyGameTweaks
         [HarmonyPrefix]
         public static void OverwriteNoteSpacing(GameController __instance)
         {
-            if (!Plugin.Instance.OverwriteNoteSpacing.Value) return;
+            if (!Plugin.Instance.OverwriteNoteSpacing.Value || ReplaySystemManager.wasPlayingReplay) return;
             if (int.TryParse(Plugin.Instance.NoteSpacing.Value, out var num) && num > 0)
                 __instance.defaultnotelength = (int)(100f / (__instance.tempo * ReplaySystemManager.gameSpeedMultiplier) * num * GlobalVariables.gamescrollspeed);
 
