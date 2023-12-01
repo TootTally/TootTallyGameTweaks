@@ -41,7 +41,7 @@ namespace TootTallyGameTweaks
         [HarmonyPostfix]
         public static void HideTromboner(GameController __instance)
         {
-            if (!Plugin.Instance.HideTromboner.Value) return;
+            if (Plugin.Instance.ShowTromboner.Value) return;
             __instance.puppet_human.SetActive(false);
         }
 
@@ -122,7 +122,7 @@ namespace TootTallyGameTweaks
         [HarmonyPostfix]
         public static void OverwriteMaximumOpeningCard(CardSceneController __instance)
         {
-            if (!Plugin.Instance.SkipCardAnimation.Value) return;
+            if (Plugin.Instance.ShowCardAnimation.Value) return;
             __instance.multipurchase_maxpacks = (int)Mathf.Clamp(__instance.currency_toots / 499f, 1, 999);
         }
 
@@ -130,7 +130,7 @@ namespace TootTallyGameTweaks
         [HarmonyPrefix]
         public static bool OverwriteOpeningCardAnimation(CardSceneController __instance)
         {
-            if (!Plugin.Instance.SkipCardAnimation.Value) return true;
+            if (Plugin.Instance.ShowCardAnimation.Value) return true;
 
             __instance.moveAwayOpenedCards();
             return __instance.multipurchase_opened_sacks >= __instance.multipurchase_chosenpacks;
@@ -138,7 +138,7 @@ namespace TootTallyGameTweaks
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.buildAllLyrics))]
         [HarmonyPrefix]
-        public static bool OverwriteBuildAllLyrics() => !Plugin.Instance.RemoveLyrics.Value;
+        public static bool OverwriteBuildAllLyrics() => Plugin.Instance.ShowLyrics.Value;
 
         private static NoteStructure[] _noteArray;
 
@@ -381,6 +381,6 @@ namespace TootTallyGameTweaks
 
         [HarmonyPatch(typeof(ConfettiMaker), nameof(ConfettiMaker.startConfetti))]
         [HarmonyPrefix]
-        public static bool RemoveAllConfetti() => !Plugin.Instance.RemoveConfetti.Value;
+        public static bool RemoveAllConfetti() => Plugin.Instance.ShowConfetti.Value;
     }
 }

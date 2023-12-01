@@ -56,14 +56,14 @@ namespace TootTallyGameTweaks
             ConfigFile config = new ConfigFile(configPath + CONFIG_NAME, true);
             ChampMeterSize = config.Bind("General", "ChampMeterSize", 1f, "Resize the champ meter to make it less intrusive.");
             SyncDuringSong = config.Bind("General", "Sync During Song", false, "Allow the game to sync during a song, may cause lags but prevent desyncs.");
-            HideTromboner = config.Bind("General", "Hide Tromboner", false, "Hide the Tromboner during gameplay.");
+            ShowTromboner = config.Bind("General", "Show Tromboner", true, "Show or hides the Tromboner during gameplay.");
             RandomizeKey = config.Bind("General", "RandomizeKey", KeyCode.F5, "Press that key to randomize.");
             MuteButtonTransparency = config.Bind("General", "MuteBtnAlpha", .25f, "Change the transparency of the mute button.");
             TouchScreenMode = config.Bind("Misc", "TouchScreenMode", false, "Tweaks for touchscreen users.");
             OverwriteNoteSpacing = config.Bind("NoteSpacing", "OverwriteNoteSpacing", false, "Make the note spacing always the same.");
             NoteSpacing = config.Bind("NoteSpacing", "NoteSpacing", 280.ToString(), "Note Spacing Value");
-            SkipCardAnimation = config.Bind("Misc", "SkipCardAnimation", true, "Skip the animation when opening cards.");
-            RemoveLyrics = config.Bind("Misc", "RemoveLyrics", false, "Remove Lyrics from songs.");
+            ShowCardAnimation = config.Bind("Misc", "ShowCardAnimation", true, "Show or skip the animation when opening cards.");
+            ShowLyrics = config.Bind("Misc", "ShowLyrics", true, "Show or remove Lyrics from songs.");
             OptimizeGame = config.Bind("Misc", "OptimizeGame", false, "Instantiate and destroy notes as they enter and leave the screen.");
             SliderSamplePoints = config.Bind("Misc", "SliderSamplePoints", 8f, "Increase or decrease the quality of slides.");
             RememberMyBoner = config.Bind("RMB", "RememberMyBoner", true, "Remembers the things you selected in the character selection screen.");
@@ -74,23 +74,25 @@ namespace TootTallyGameTweaks
             VibeID = config.Bind("RMB", "VibeID", 0, "Remembers the vibe you selected.");
             SoundID = config.Bind("RMB", "SoundID", 0, "Remembers the sound you selected.");
             AudioLatencyFix = config.Bind("Misc", "AudioLatencyFix", true, "Fix audio latency bug related when playing at different game speeds.");
-            RemoveConfetti = config.Bind("Misc", "Remove Confetti", false, "Removes the confetti in the score screen.");
+            ShowConfetti = config.Bind("Misc", "Show Confetti", true, "Show or remove the confetti in the score screen.");
 
             settingPage = TootTallySettingsManager.AddNewPage("GameTweaks", "Game Tweaks", 40f, new Color(0, 0, 0, 0));
             settingPage?.AddSlider("Champ Meter Size", 0, 1, ChampMeterSize, false);
             settingPage?.AddSlider("Mute Btn Alpha", 0, 1, MuteButtonTransparency, false);
-            settingPage?.AddToggle("Hide Tromboner", HideTromboner);
+            settingPage?.AddToggle("Show Tromboner", ShowTromboner);
             settingPage?.AddToggle("Sync During Song", SyncDuringSong);
             settingPage?.AddToggle("Touchscreen Mode", TouchScreenMode, (value) => GlobalVariables.localsettings.mousecontrolmode = value ? 0 : 1);
-            settingPage?.AddToggle("Skip Card Animation", SkipCardAnimation);
+            settingPage?.AddToggle("Show Card Animation", ShowCardAnimation);
             settingPage?.AddToggle("Overwrite Note Spacing", OverwriteNoteSpacing, OnOverwriteNoteSpacingToggle);
-            settingPage?.AddToggle("Remove Lyrics", RemoveLyrics);
+            settingPage?.AddToggle("Show Lyrics", ShowLyrics);
             settingPage?.AddToggle("Optimize Game", OptimizeGame, OnOptimizeGameToggle);
             OnOptimizeGameToggle(OptimizeGame.Value);
             settingPage?.AddToggle("Remember My Boner", RememberMyBoner);
             OnOverwriteNoteSpacingToggle(OverwriteNoteSpacing.Value);
             settingPage?.AddToggle("Fix Audio Latency", AudioLatencyFix);
-            settingPage?.AddToggle("Remove Confetti", RemoveConfetti);
+            settingPage?.AddToggle("Show Confetti", ShowConfetti);
+
+            TootTallySettings.Plugin.TryAddThunderstoreIconToPageButton(Instance.Info.Location, Name, settingPage);
 
             _harmony.PatchAll(typeof(GameTweaksPatches));
             LogInfo($"Module loaded!");
@@ -135,9 +137,9 @@ namespace TootTallyGameTweaks
         public ConfigEntry<bool> TouchScreenMode { get; set; }
         public ConfigEntry<bool> OverwriteNoteSpacing { get; set; }
         public ConfigEntry<string> NoteSpacing { get; set; }
-        public ConfigEntry<bool> HideTromboner { get; set; }
-        public ConfigEntry<bool> SkipCardAnimation { get; set; }
-        public ConfigEntry<bool> RemoveLyrics { get; set; }
+        public ConfigEntry<bool> ShowTromboner { get; set; }
+        public ConfigEntry<bool> ShowCardAnimation { get; set; }
+        public ConfigEntry<bool> ShowLyrics { get; set; }
         public ConfigEntry<bool> OptimizeGame { get; set; }
         public ConfigEntry<float> SliderSamplePoints { get; set; }
         public ConfigEntry<bool> RememberMyBoner { get; set; }
@@ -148,6 +150,6 @@ namespace TootTallyGameTweaks
         public ConfigEntry<int> VibeID { get; set; }
         public ConfigEntry<int> TromboneID { get; set; }
         public ConfigEntry<bool> AudioLatencyFix { get; set; }
-        public ConfigEntry<bool> RemoveConfetti { get; set; }
+        public ConfigEntry<bool> ShowConfetti { get; set; }
     }
 }
