@@ -371,11 +371,7 @@ namespace TootTallyGameTweaks
         {
             if (!Plugin.Instance.AudioLatencyFix.Value) return;
 
-            if (GlobalVariables.practicemode != 1)
-                __instance.latency_offset = GlobalVariables.localsettings.latencyadjust * 0.001f * GlobalVariables.practicemode;
-            else if (GlobalVariables.turbomode)
-                __instance.latency_offset = GlobalVariables.localsettings.latencyadjust * 0.002f;
-            else
+            if (GlobalVariables.practicemode == 1 && !GlobalVariables.turbomode)
                 __instance.latency_offset = GlobalVariables.localsettings.latencyadjust * 0.001f * ReplaySystemManager.gameSpeedMultiplier;
         }
 
