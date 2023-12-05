@@ -8,7 +8,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>latest</LangVersion>
 		<TromboneChampDir>E:\SteamLibrary\steamapps\common\TromboneChamp</TromboneChampDir>
-		<TromboneTootDir>C:\Users\Sabz\AppData\Roaming\r2modmanPlus-local\TromboneChamp\profiles\TTCoreTesting</TromboneTootDir>
+		<TromboneTootDir>C:\Users\Sabz\AppData\Roaming\r2modmanPlus-local\TromboneChamp\profiles\Default</TromboneTootDir>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -27,20 +27,20 @@
 
 	<ItemGroup>
 		<Reference Include="TootTallyCore">
-			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-Core\TootTallyCore.dll</HintPath>
+			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-TootTallyCore\TootTallyCore.dll</HintPath>
 		</Reference>
 		<Reference Include="TootTallySettings">
-			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-Settings\TootTallySettings.dll</HintPath>
+			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-TootTallySettings\TootTallySettings.dll</HintPath>
 		</Reference>
 		<Reference Include="TootTallyLeaderboard">
-			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-Leaderboard\TootTallyLeaderboard.dll</HintPath>
+			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-TootTallyLeaderboard\TootTallyLeaderboard.dll</HintPath>
 		</Reference>
 		<Reference Include="TootTallySpectator">
-			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-Spectator\TootTallySpectator.dll</HintPath>
+			<HintPath>$(TromboneTootDir)\BepInEx\plugins\TootTally-TootTallySpectator\TootTallySpectator.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TromboneTootDir)\BepInEx\plugins\TootTally-GameTweaks" />
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(TromboneTootDir)\BepInEx\plugins\TootTally-TootTallyGameTweaks" />
 	</Target>
 </Project>

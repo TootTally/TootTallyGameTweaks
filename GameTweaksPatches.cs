@@ -26,6 +26,14 @@ namespace TootTallyGameTweaks
         }
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
+        [HarmonyPrefix]
+        public static void RemoveMouseSmoothing()
+        {
+            if (Plugin.Instance.EnableMouseSmoothing.Value) return;
+            GlobalVariables.localsettings.mouse_smoothing = 0;
+        }
+
+        [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
         [HarmonyPostfix]
         public static void TouchScreenPatch(GameController __instance)
         {
