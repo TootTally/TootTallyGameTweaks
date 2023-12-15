@@ -25,12 +25,19 @@ namespace TootTallyGameTweaks
             __instance.healthmask.transform.parent.localScale = Vector2.one * Plugin.Instance.ChampMeterSize.Value;
         }
 
-        [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
+        [HarmonyPatch(typeof(GameController), nameof(GameController.Update))]
         [HarmonyPrefix]
-        public static void RemoveMouseSmoothing()
+        public static void MovePointerWithoutSmoothing(GameController __instance)
         {
-            if (Plugin.Instance.EnableMouseSmoothing.Value) return;
-            GlobalVariables.localsettings.mouse_smoothing = 0;
+            if (!Plugin.Instance.FixMouseSmoothing.Value) return;
+            __instance.controllermode = true;
+            var mousePos = Input.mousePosition.y / Screen.height;
+            mousePos -= .5f;
+            mousePos *= 1.3f * (GlobalVariables.localsettings.sensitivity * .2f + .8f);
+            mousePos = Mathf.Clamp(mousePos * 350f, -__instance.vbounds - __instance.outerbuffer, __instance.vbounds + __instance.outerbuffer);
+            var newPointerPos = new Vector2(60f, mousePos);
+            __instance.pointer.transform.localPosition = newPointerPos;
+
         }
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
