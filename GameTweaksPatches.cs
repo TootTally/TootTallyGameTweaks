@@ -29,11 +29,11 @@ namespace TootTallyGameTweaks
         [HarmonyPrefix]
         public static void MovePointerWithoutSmoothing(GameController __instance)
         {
-            if (!Plugin.Instance.FixMouseSmoothing.Value) return;
+            if (!Plugin.Instance.FixMouseSmoothing.Value || ReplaySystemManager.wasPlayingReplay || SpectatingManager.IsSpectating) return;
             __instance.controllermode = true;
             var mousePos = Input.mousePosition.y / Screen.height;
             mousePos -= .5f;
-            mousePos *= 1.3f * (GlobalVariables.localsettings.sensitivity * .2f + .8f);
+            mousePos *= 1.3f * GlobalVariables.localsettings.sensitivity;
             mousePos = Mathf.Clamp(mousePos * 350f, -__instance.vbounds - __instance.outerbuffer, __instance.vbounds + __instance.outerbuffer);
             var newPointerPos = new Vector2(60f, mousePos);
             __instance.pointer.transform.localPosition = newPointerPos;
