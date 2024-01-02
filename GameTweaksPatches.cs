@@ -25,21 +25,6 @@ namespace TootTallyGameTweaks
             __instance.healthmask.transform.parent.localScale = Vector2.one * Plugin.Instance.ChampMeterSize.Value;
         }
 
-        [HarmonyPatch(typeof(GameController), nameof(GameController.Update))]
-        [HarmonyPrefix]
-        public static void MovePointerWithoutSmoothing(GameController __instance)
-        {
-            if (!Plugin.Instance.FixMouseSmoothing.Value || ReplaySystemManager.wasPlayingReplay || SpectatingManager.IsSpectating) return;
-            __instance.controllermode = true;
-            var mousePos = Input.mousePosition.y / Screen.height;
-            mousePos -= .5f;
-            mousePos *= 1.3f * GlobalVariables.localsettings.sensitivity;
-            mousePos = Mathf.Clamp(mousePos * 350f, -__instance.vbounds - __instance.outerbuffer, __instance.vbounds + __instance.outerbuffer);
-            var newPointerPos = new Vector2(60f, mousePos);
-            __instance.pointer.transform.localPosition = newPointerPos;
-
-        }
-
         [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
         [HarmonyPostfix]
         public static void TouchScreenPatch(GameController __instance)
@@ -379,16 +364,6 @@ namespace TootTallyGameTweaks
             Plugin.Instance.LongTrombone.Value = GlobalVariables.show_long_trombone;
         }
         #endregion
-
-        [HarmonyPatch(typeof(GameController), nameof(GameController.buildNotes))]
-        [HarmonyPrefix]
-        public static void FixAudioLatency(GameController __instance)
-        {
-            if (!Plugin.Instance.AudioLatencyFix.Value) return;
-
-            if (GlobalVariables.practicemode == 1 && !GlobalVariables.turbomode)
-                __instance.latency_offset = GlobalVariables.localsettings.latencyadjust * 0.001f * ReplaySystemManager.gameSpeedMultiplier;
-        }
 
         [HarmonyPatch(typeof(ConfettiMaker), nameof(ConfettiMaker.startConfetti))]
         [HarmonyPrefix]

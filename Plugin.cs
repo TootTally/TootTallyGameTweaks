@@ -73,9 +73,7 @@ namespace TootTallyGameTweaks
             TromboneID = config.Bind("RMB", "TromboneID", 0, "Remembers the trombone you selected.");
             VibeID = config.Bind("RMB", "VibeID", 0, "Remembers the vibe you selected.");
             SoundID = config.Bind("RMB", "SoundID", 0, "Remembers the sound you selected.");
-            AudioLatencyFix = config.Bind("Misc", "AudioLatencyFix", true, "Fix audio latency bug related when playing at different game speeds.");
             ShowConfetti = config.Bind("Misc", "Show Confetti", true, "Show or remove the confetti in the score screen.");
-            FixMouseSmoothing = config.Bind("Misc", "Fix Mouse Smoothing", false, "Completely remove the mouse smoothing from the pointer.");
 
             settingPage = TootTallySettingsManager.AddNewPage("GameTweaks", "Game Tweaks", 40f, new Color(0, 0, 0, 0));
             settingPage?.AddSlider("Champ Meter Size", 0, 1, ChampMeterSize, false);
@@ -90,9 +88,7 @@ namespace TootTallyGameTweaks
             OnOptimizeGameToggle(OptimizeGame.Value);
             settingPage?.AddToggle("Remember My Boner", RememberMyBoner);
             OnOverwriteNoteSpacingToggle(OverwriteNoteSpacing.Value);
-            settingPage?.AddToggle("Fix Audio Latency", AudioLatencyFix);
             settingPage?.AddToggle("Show Confetti", ShowConfetti);
-            settingPage?.AddToggle("Fix Mouse Smoothing", FixMouseSmoothing);
 
             TootTallySettings.Plugin.TryAddThunderstoreIconToPageButton(Instance.Info.Location, Name, settingPage);
 
@@ -151,8 +147,6 @@ namespace TootTallyGameTweaks
         public ConfigEntry<int> SoundID { get; set; }
         public ConfigEntry<int> VibeID { get; set; }
         public ConfigEntry<int> TromboneID { get; set; }
-        public ConfigEntry<bool> AudioLatencyFix { get; set; }
         public ConfigEntry<bool> ShowConfetti { get; set; }
-        public ConfigEntry<bool> FixMouseSmoothing { get; set; }
     }
 }
