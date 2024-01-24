@@ -45,11 +45,20 @@ namespace TootTallyGameTweaks
             __instance.puppet_human.SetActive(false);
         }
 
+        private static bool _isOldReplay;
+
+        [HarmonyPatch(typeof(NewReplaySystem), nameof(NewReplaySystem.LoadReplay))]
+        [HarmonyPostfix]
+        public static void GetIsOldReplay(NewReplaySystem __instance)
+        {
+            _isOldReplay = __instance.GetIsOldReplay;
+        }
+
         [HarmonyPatch(typeof(GameController), nameof(GameController.buildNotes))]
         [HarmonyPrefix]
         public static void OverwriteNoteSpacing(GameController __instance)
         {
-            if (!Plugin.Instance.OverwriteNoteSpacing.Value || ReplaySystemManager.wasPlayingReplay) return;
+            if (!Plugin.Instance.OverwriteNoteSpacing.Value || (ReplaySystemManager.wasPlayingReplay && _isOldReplay)) return;
             if (int.TryParse(Plugin.Instance.NoteSpacing.Value, out var num) && num > 0)
                 __instance.defaultnotelength = (int)(100f / (__instance.tempo * ReplaySystemManager.gameSpeedMultiplier) * num * GlobalVariables.gamescrollspeed);
 
