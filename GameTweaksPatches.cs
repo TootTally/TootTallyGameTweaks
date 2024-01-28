@@ -5,8 +5,7 @@ using TootTallyCore.Graphics;
 using TootTallyCore.Utils.Assets;
 using UnityEngine.UI;
 using UnityEngine;
-using TootTallyLeaderboard.Replays;
-using TootTallySpectator;
+using TootTallyCore.Utils.TootTallyGlobals;
 
 namespace TootTallyGameTweaks
 {
@@ -45,22 +44,13 @@ namespace TootTallyGameTweaks
             __instance.puppet_human.SetActive(false);
         }
 
-        private static bool _isOldReplay;
-
-        [HarmonyPatch(typeof(NewReplaySystem), nameof(NewReplaySystem.LoadReplay))]
-        [HarmonyPostfix]
-        public static void GetIsOldReplay(NewReplaySystem __instance)
-        {
-            _isOldReplay = __instance.GetIsOldReplay;
-        }
-
         [HarmonyPatch(typeof(GameController), nameof(GameController.buildNotes))]
         [HarmonyPrefix]
         public static void OverwriteNoteSpacing(GameController __instance)
         {
-            if (!Plugin.Instance.OverwriteNoteSpacing.Value || (ReplaySystemManager.wasPlayingReplay && _isOldReplay)) return;
+            if (!Plugin.Instance.OverwriteNoteSpacing.Value || (TootTallyGlobalVariables.wasReplaying && TootTallyGlobalVariables.isOldReplay)) return;
             if (int.TryParse(Plugin.Instance.NoteSpacing.Value, out var num) && num > 0)
-                __instance.defaultnotelength = (int)(100f / (__instance.tempo * ReplaySystemManager.gameSpeedMultiplier) * num * GlobalVariables.gamescrollspeed);
+                __instance.defaultnotelength = (int)(100f / (__instance.tempo * TootTallyGlobalVariables.gameSpeedMultiplier) * num * GlobalVariables.gamescrollspeed);
 
         }
 
@@ -111,8 +101,8 @@ namespace TootTallyGameTweaks
         {
             if (Input.GetKey(KeyCode.Space)) return true; //Sync if holding down spacebar
             if (Plugin.Instance.SyncDuringSong.Value) return true; //always sync if enabled
-            if (ReplaySystemManager.wasPlayingReplay) return true; //always sync if watching replay
-            if (SpectatingManager.IsSpectating) return true; //always sync if spectating someone
+            if (TootTallyGlobalVariables.wasReplaying) return true; //always sync if watching replay
+            if (TootTallyGlobalVariables.isSpectating) return true; //always sync if spectating someone
 
             var previousSync = _hasSyncedOnce;
             _hasSyncedOnce = true;
@@ -155,7 +145,7 @@ namespace TootTallyGameTweaks
         [HarmonyPrefix]
         public static bool OverwriteBuildNotes(GameController __instance)
         {
-            if (!Plugin.Instance.OptimizeGame.Value || ReplaySystemManager.wasPlayingReplay) return true;
+            if (!Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying) return true;
 
             BuildNoteArray(__instance, TrombLoader.Plugin.Instance.beatsToShow.Value);
             BuildNotes(__instance);
@@ -169,7 +159,7 @@ namespace TootTallyGameTweaks
         [HarmonyPostfix]
         public static void OnGrabNoteRefsInstantiateNote(GameController __instance)
         {
-            if (!Plugin.Instance.OptimizeGame.Value || ReplaySystemManager.wasPlayingReplay) return;
+            if (!Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying) return;
 
             if (__instance.beatstoshow < __instance.leveldata.Count)
             {
@@ -211,7 +201,7 @@ namespace TootTallyGameTweaks
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.activateNextNote))]
         [HarmonyPrefix]
-        public static bool RemoveActivateNextNote() => !Plugin.Instance.OptimizeGame.Value || ReplaySystemManager.wasPlayingReplay;
+        public static bool RemoveActivateNextNote() => !Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying;
 
         private static void BuildNotes(GameController __instance)
         {

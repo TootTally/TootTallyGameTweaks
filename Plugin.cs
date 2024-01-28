@@ -11,11 +11,9 @@ using TootTallyCore.Utils.TootTallyNotifs;
 namespace TootTallyGameTweaks
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    [BepInDependency("TootTallyCore", BepInDependency.DependencyFlags.HardDependency)]
     [BepInDependency("TootTallySettings", BepInDependency.DependencyFlags.HardDependency)]
     //Temporary
-    [BepInDependency("TootTallyLeaderboard", BepInDependency.DependencyFlags.HardDependency)]
-    [BepInDependency("TootTallySpectator", BepInDependency.DependencyFlags.HardDependency)]
+    [BepInDependency("TootTallyGameModifiers", BepInDependency.DependencyFlags.HardDependency)]
     public class Plugin : BaseUnityPlugin, ITootTallyModule
     {
         public static Plugin Instance;
