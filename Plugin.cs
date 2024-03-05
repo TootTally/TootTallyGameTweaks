@@ -81,11 +81,11 @@ namespace TootTallyGameTweaks
             settingPage?.AddToggle("Touchscreen Mode", TouchScreenMode, (value) => GlobalVariables.localsettings.mousecontrolmode = value ? 0 : 1);
             settingPage?.AddToggle("Show Card Animation", ShowCardAnimation);
             settingPage?.AddToggle("Overwrite Note Spacing", OverwriteNoteSpacing, OnOverwriteNoteSpacingToggle);
+            OnOverwriteNoteSpacingToggle(OverwriteNoteSpacing.Value);
             settingPage?.AddToggle("Show Lyrics", ShowLyrics);
             settingPage?.AddToggle("Optimize Game", OptimizeGame, OnOptimizeGameToggle);
             OnOptimizeGameToggle(OptimizeGame.Value);
             settingPage?.AddToggle("Remember My Boner", RememberMyBoner);
-            OnOverwriteNoteSpacingToggle(OverwriteNoteSpacing.Value);
             settingPage?.AddToggle("Show Confetti", ShowConfetti);
 
             TootTallySettings.Plugin.TryAddThunderstoreIconToPageButton(Instance.Info.Location, Name, settingPage);
