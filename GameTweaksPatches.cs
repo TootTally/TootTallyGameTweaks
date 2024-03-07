@@ -155,11 +155,11 @@ namespace TootTallyGameTweaks
 
         private static Queue<Coroutine> _currentCoroutines;
 
-        [HarmonyPatch(typeof(GameController), nameof(GameController.animateOutNote))]
+        [HarmonyPatch(typeof(GameController), nameof(GameController.grabNoteRefs))]
         [HarmonyPostfix]
-        public static void OnGrabNoteRefsInstantiateNote(GameController __instance)
+        public static void OnGrabNoteRefsInstantiateNote(GameController __instance, int indexinc)
         {
-            if (!Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying) return;
+            if (!Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying || indexinc == 0) return;
 
             if (__instance.beatstoshow < __instance.leveldata.Count)
             {
@@ -171,6 +171,14 @@ namespace TootTallyGameTweaks
                     })));
             }
 
+        }
+
+        [HarmonyPatch(typeof(GameController), nameof(GameController.animateOutNote))]
+        [HarmonyPrefix]
+        public static void ClearNotesToDestroyIfOptimizingGame(GameController __instance)
+        {
+            if (!Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying) return;
+            __instance.note_objs_to_destroy.Clear();
         }
 
         public static IEnumerator<WaitForSeconds> WaitForSecondsCallback(float seconds, Action callback)
@@ -249,6 +257,7 @@ namespace TootTallyGameTweaks
             NoteStructure currentNote = _noteArray[index % _noteArray.Length];
             currentNote.CancelLeanTweens();
             currentNote.root.transform.localScale = Vector3.one;
+            currentNote.root.SetActive(true);
             __instance.allnotes.Add(currentNote.root);
             __instance.flipscheme = previousNoteIsSlider && !__instance.flipscheme;
 
