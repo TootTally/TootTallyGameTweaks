@@ -175,9 +175,11 @@ namespace TootTallyGameTweaks
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.animateOutNote))]
         [HarmonyPrefix]
-        public static void ClearNotesToDestroyIfOptimizingGame(GameController __instance)
+        public static void ClearNotesToDestroyIfOptimizingGame(GameController __instance, int noteindex)
         {
             if (!Plugin.Instance.OptimizeGame.Value || TootTallyGlobalVariables.wasReplaying) return;
+
+            LeanTween.scaleY(__instance.allnotes[noteindex], 0.0001f, 0.1f).setEaseOutQuart();
             __instance.note_objs_to_destroy.Clear();
         }
 
