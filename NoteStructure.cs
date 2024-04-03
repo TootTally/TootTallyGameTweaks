@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace TootTallyGameTweaks
 {
-    public class NoteStructure
+    public struct NoteStructure
     {
         public GameObject root, noteStart, noteEnd;
         public NoteDesigner noteDesigner;
