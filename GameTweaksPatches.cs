@@ -88,7 +88,7 @@ namespace TootTallyGameTweaks
             }
         }
 
-        [HarmonyPatch(typeof(GameController), nameof(GameController.startSong))]
+        [HarmonyPatch(typeof(GameController), nameof(GameController.playsong))]
         [HarmonyPostfix]
         public static void ResetSyncFlag()
         {
