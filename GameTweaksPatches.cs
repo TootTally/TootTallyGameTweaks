@@ -90,8 +90,9 @@ namespace TootTallyGameTweaks
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.playsong))]
         [HarmonyPostfix]
-        public static void ResetSyncFlag()
+        public static void ResetSyncFlag(GameController __instance)
         {
+            __instance.resync_timer = 5;
             _hasSyncedOnce = false;
         }
 
@@ -103,7 +104,6 @@ namespace TootTallyGameTweaks
             if (Plugin.Instance.SyncDuringSong.Value) return true; //always sync if enabled
             if (TootTallyGlobalVariables.wasReplaying) return true; //always sync if watching replay
             if (TootTallyGlobalVariables.isSpectating) return true; //always sync if spectating someone
-
             var previousSync = _hasSyncedOnce;
             _hasSyncedOnce = true;
             return !previousSync;
