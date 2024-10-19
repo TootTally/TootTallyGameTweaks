@@ -12,8 +12,6 @@ namespace TootTallyGameTweaks
 {
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     [BepInDependency("TootTallySettings", BepInDependency.DependencyFlags.HardDependency)]
-    //Temporary
-    [BepInDependency("TootTallyGameModifiers", BepInDependency.DependencyFlags.HardDependency)]
     public class Plugin : BaseUnityPlugin, ITootTallyModule
     {
         public static Plugin Instance;

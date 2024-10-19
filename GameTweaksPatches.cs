@@ -96,11 +96,17 @@ namespace TootTallyGameTweaks
             _hasSyncedOnce = false;
         }
 
+        [HarmonyPatch(typeof(GameController), nameof(GameController.Update))]
+        [HarmonyPrefix]
+        public static void SyncBufferOnUpdate()
+        {
+            if (_hasSyncedOnce && Input.GetKey(KeyCode.Space)) _hasSyncedOnce = false;
+        }
+
         [HarmonyPatch(typeof(GameController), nameof(GameController.syncTrackPositions))]
         [HarmonyPrefix]
         public static bool SyncOnlyOnce()
         {
-            if (Input.GetKey(KeyCode.Space)) return true; //Sync if holding down spacebar
             if (Plugin.Instance.SyncDuringSong.Value) return true; //always sync if enabled
             if (TootTallyGlobalVariables.wasReplaying) return true; //always sync if watching replay
             if (TootTallyGlobalVariables.isSpectating) return true; //always sync if spectating someone
