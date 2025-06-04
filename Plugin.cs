@@ -61,6 +61,8 @@ namespace TootTallyGameTweaks
             ShowCardAnimation = config.Bind("Misc", "ShowCardAnimation", true, "Show or skip the animation when opening cards.");
             ShowLyrics = config.Bind("Misc", "ShowLyrics", true, "Show or remove Lyrics from songs.");
             OptimizeGame = config.Bind("Misc", "OptimizeGame", false, "Instantiate and destroy notes as they enter and leave the screen.");
+            ExperimentalSync = config.Bind("Misc", "ExperiementalSync", false, "Attempt at fixing syncing issues with very long charts.");
+            ResyncStrength = config.Bind("Misc", "ResyncStrength", 60f, "Increase the strength of the resync: higher means resync will be more aggressive. RECOMMENDED: 40-80");
             SliderSamplePoints = config.Bind("Misc", "SliderSamplePoints", 8f, "Increase or decrease the quality of slides.");
             RememberMyBoner = config.Bind("RMB", "RememberMyBoner", true, "Remembers the things you selected in the character selection screen.");
             TootRainbow = config.Bind("RMB", "TootRainbow", false, "Remembers the tootrainbow you selected.");
@@ -76,6 +78,8 @@ namespace TootTallyGameTweaks
             settingPage?.AddSlider("Mute Btn Alpha", 0, 1, MuteButtonTransparency, false);
             settingPage?.AddToggle("Show Tromboner", ShowTromboner);
             settingPage?.AddToggle("Sync During Song", SyncDuringSong);
+            settingPage?.AddToggle("Experiemental Syncing", ExperimentalSync, OnExperimentalSyncToggle);
+            OnExperimentalSyncToggle(ExperimentalSync.Value);
             settingPage?.AddToggle("Touchscreen Mode", TouchScreenMode, (value) => GlobalVariables.localsettings.mousecontrolmode = value ? 0 : 1);
             settingPage?.AddToggle("Show Card Animation", ShowCardAnimation);
             settingPage?.AddToggle("Overwrite Note Spacing", OverwriteNoteSpacing, OnOverwriteNoteSpacingToggle);
@@ -99,13 +103,28 @@ namespace TootTallyGameTweaks
             LogInfo($"Module unloaded!");
         }
 
+        public void OnExperimentalSyncToggle(bool value)
+        {
+            if (value)
+            {
+                settingPage?.AddSlider("ResyncStrength", 1, 240, ResyncStrength, true);
+            }
+            else
+            {
+                settingPage?.RemoveSettingObjectFromList("ResyncStrength");
+            }
+        }
+
         public void OnOptimizeGameToggle(bool value)
         {
             if (value)
+            {
                 settingPage?.AddSlider("SliderSamplePoints", 2, 50, SliderSamplePoints, true);
+            }
             else
+            {
                 settingPage?.RemoveSettingObjectFromList("SliderSamplePoints");
-
+            }
         }
 
         public void OnOverwriteNoteSpacingToggle(bool value)
@@ -135,6 +154,8 @@ namespace TootTallyGameTweaks
         public ConfigEntry<bool> ShowCardAnimation { get; set; }
         public ConfigEntry<bool> ShowLyrics { get; set; }
         public ConfigEntry<bool> OptimizeGame { get; set; }
+        public ConfigEntry<bool> ExperimentalSync { get; set; }
+        public ConfigEntry<float> ResyncStrength { get; set; }
         public ConfigEntry<float> SliderSamplePoints { get; set; }
         public ConfigEntry<bool> RememberMyBoner { get; set; }
         public ConfigEntry<bool> LongTrombone { get; set; }

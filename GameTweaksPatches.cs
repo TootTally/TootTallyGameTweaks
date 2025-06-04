@@ -87,7 +87,7 @@ namespace TootTallyGameTweaks
                 Cursor.visible = true;
             }
         }
-
+        
         [HarmonyPatch(typeof(GameController), nameof(GameController.playsong))]
         [HarmonyPostfix]
         public static void ResetSyncFlag(GameController __instance)
@@ -101,6 +101,32 @@ namespace TootTallyGameTweaks
         public static void SyncBufferOnUpdate()
         {
             if (_hasSyncedOnce && Input.GetKey(KeyCode.Space)) _hasSyncedOnce = false;
+        }
+
+        [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
+        [HarmonyPrefix]
+        public static void InitTrackSyncronizer(GameController __instance)
+        {
+            if (!Plugin.Instance.ExperimentalSync.Value || TootTallyGlobalVariables.wasReplaying || TootTallyGlobalVariables.isSpectating) return;
+            _trackSyncronizer = Vector2.zero;
+        }
+
+        public static float _lastTimeSample = 0;
+        public static double _lastTimeLockedPosition = 0;
+
+        [HarmonyPatch(typeof(GameController), nameof(GameController.Update))]
+        [HarmonyPostfix]
+        public static void TryAdjustingTrackSyncing(GameController __instance)
+        {
+            if (!Plugin.Instance.ExperimentalSync.Value || TootTallyGlobalVariables.wasReplaying || TootTallyGlobalVariables.isSpectating) return;
+            _lastTimeLockedPosition -= (double)Time.deltaTime * (__instance.trackmovemult * __instance.smooth_scrolling_move_mult * __instance.smooth_scrolling_mod_mult);
+            __instance.track_xpos_smoothscrolling += (_lastTimeLockedPosition - __instance.noteholderr.anchoredPosition.x) / (241f - Plugin.Instance.ResyncStrength.Value);
+            if (_lastTimeSample != __instance.musictrack.timeSamples)
+            {
+                var trackTimeP = (double)__instance.musictrack.time - __instance.latency_offset - __instance.noteoffset;
+                _lastTimeLockedPosition = (float)(__instance.zeroxpos + trackTimeP * -__instance.trackmovemult);
+                _lastTimeSample = __instance.musictrack.timeSamples;
+            }
         }
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.syncTrackPositions))]
