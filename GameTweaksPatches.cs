@@ -87,15 +87,22 @@ namespace TootTallyGameTweaks
                 Cursor.visible = true;
             }
         }
-        
+
         [HarmonyPatch(typeof(GameController), nameof(GameController.playsong))]
         [HarmonyPostfix]
         public static void ResetSyncFlag(GameController __instance)
         {
+            _lastTimeLockedPosition = 0;
+            _lastTimeSample = 0;
             __instance.resync_timer = 5;
             _hasSyncedOnce = false;
         }
 
+        [HarmonyPatch(typeof(GameController), nameof(GameController.playsong))]
+        [HarmonyPostfix]
+        public static void ResetSyncFlagBackup(GameController __instance) => ResetSyncFlag(__instance);
+
+        
         [HarmonyPatch(typeof(GameController), nameof(GameController.Update))]
         [HarmonyPrefix]
         public static void SyncBufferOnUpdate()
@@ -103,22 +110,17 @@ namespace TootTallyGameTweaks
             if (_hasSyncedOnce && Input.GetKey(KeyCode.Space)) _hasSyncedOnce = false;
         }
 
-        [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
-        [HarmonyPrefix]
-        public static void InitTrackSyncronizer(GameController __instance)
-        {
-            if (!Plugin.Instance.ExperimentalSync.Value || TootTallyGlobalVariables.wasReplaying || TootTallyGlobalVariables.isSpectating) return;
-            _trackSyncronizer = Vector2.zero;
-        }
-
-        public static float _lastTimeSample = 0;
-        public static double _lastTimeLockedPosition = 0;
+        public static float _lastTimeSample;
+        public static double _lastTimeLockedPosition;
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.Update))]
         [HarmonyPostfix]
         public static void TryAdjustingTrackSyncing(GameController __instance)
         {
             if (!Plugin.Instance.ExperimentalSync.Value || TootTallyGlobalVariables.wasReplaying || TootTallyGlobalVariables.isSpectating) return;
+
+            if (__instance.paused || __instance.quitting || __instance.retrying || __instance.freeplay || !__instance.musictrack.isPlaying) return;
+
             _lastTimeLockedPosition -= (double)Time.deltaTime * (__instance.trackmovemult * __instance.smooth_scrolling_move_mult * __instance.smooth_scrolling_mod_mult);
             __instance.track_xpos_smoothscrolling += (_lastTimeLockedPosition - __instance.noteholderr.anchoredPosition.x) / (241f - Plugin.Instance.ResyncStrength.Value);
             if (_lastTimeSample != __instance.musictrack.timeSamples)
