@@ -60,8 +60,8 @@ namespace TootTallyGameTweaks
             NoteSpacing = config.Bind("NoteSpacing", "NoteSpacing", 280.ToString(), "Note Spacing Value");
             ShowCardAnimation = config.Bind("Misc", "ShowCardAnimation", true, "Show or skip the animation when opening cards.");
             ShowLyrics = config.Bind("Misc", "ShowLyrics", true, "Show or remove Lyrics from songs.");
-            OptimizeGame = config.Bind("Misc", "OptimizeGame", false, "Instantiate and destroy notes as they enter and leave the screen.");
-            ExperimentalSync = config.Bind("Misc", "ExperiementalSync", false, "Attempt at fixing syncing issues with very long charts.");
+            OptimizeGame = config.Bind("Misc", "OptimizeGame", true, "Instantiate and destroy notes as they enter and leave the screen.");
+            ExperimentalSync = config.Bind("Misc", "ExperiementalSync", true, "Attempt at fixing syncing issues with very long charts.");
             ResyncStrength = config.Bind("Misc", "ResyncStrength", 60f, "Increase the strength of the resync: higher means resync will be more aggressive. RECOMMENDED: 40-80");
             SliderSamplePoints = config.Bind("Misc", "SliderSamplePoints", 8f, "Increase or decrease the quality of slides.");
             RememberMyBoner = config.Bind("RMB", "RememberMyBoner", true, "Remembers the things you selected in the character selection screen.");

@@ -18,10 +18,8 @@ namespace TootTallyGameTweaks
         public static void FixChampMeterSize(GameController __instance)
         {
             if (Plugin.Instance.ChampMeterSize.Value == 1f) return;
-            //0.29f is the default localScale size
-            __instance.champcontroller.letters[0].transform.parent.localScale = Vector2.one * 0.29f * Plugin.Instance.ChampMeterSize.Value; // :skull: that's how the base game gets that object...
-            //__instance..transform.parent.SetParent(__instance.champcontroller.letters[0].transform.parent, true);
-            //__instance.healthmask.transform.parent.localScale = Vector2.one * Plugin.Instance.ChampMeterSize.Value;
+            //0.12f is the default localScale size
+            __instance.champcontroller.letters[0].transform.parent.localScale = Vector2.one * 0.12f * Plugin.Instance.ChampMeterSize.Value; // :skull: that's how the base game gets that object...
         }
 
         [HarmonyPatch(typeof(GameController), nameof(GameController.Start))]
